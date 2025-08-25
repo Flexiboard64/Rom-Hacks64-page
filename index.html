@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ROM Hacks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --blue-600: #0d6efd;
+        --blue-700: #0b5ed7;
+        --blue-800: #0a58ca;
+        --white: #ffffff;
+        --black: #000000;
+        --gray-50: #f8f9fa;
+        --yellow-400: #ffd60a;
+        --yellow-500: #f7c600;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--gray-50);
+        color: #111827;
+      }
+
+      /* Top blue bar */
+      .top-bar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        background: var(--blue-600);
+        color: var(--white);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+
+      .top-bar-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 40px;
+        flex-wrap: wrap;
+      }
+
+      .site-title {
+        font-family: 'Press Start 2P', system-ui, monospace;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: var(--white);
+        text-decoration: none;
+        text-shadow: 0 2px 0 rgba(0,0,0,0.25);
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .top-links {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .nav-button {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 999px;
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 600;
+        line-height: 1;
+        background: rgba(255, 255, 255, 0.12);
+        transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+      }
+
+      .nav-button:hover {
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transform: translateY(-1px);
+      }
+
+      .nav-button:active {
+        transform: translateY(0);
+      }
+
+      .nav-button.donate {
+        background: linear-gradient(180deg, var(--yellow-400), var(--yellow-500));
+        color: #1f2937;
+        box-shadow: 0 6px 14px rgba(247, 198, 0, 0.35);
+      }
+
+      .nav-button.donate:hover {
+        filter: brightness(0.98);
+      }
+
+      /* Page content spacing so bars don't overlap */
+      main {
+        max-width: 1100px;
+        margin: 24px auto 72px auto; /* bottom margin leaves room for bottom bar */
+        padding: 0 16px;
+      }
+
+      .hero {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      }
+
+      .hero h1 {
+        margin: 0 0 8px 0;
+        font-size: 28px;
+      }
+
+      .hero p {
+        margin: 0;
+        color: #4b5563;
+      }
+
+      /* Bottom black bar */
+      .bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--black);
+        color: var(--white);
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      .bottom-bar small {
+        opacity: 0.85;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <nav class="top-bar-inner" aria-label="Main">
+        <div class="site-title">ROM HACKS64</div>
+        <div class="top-links">
+          <a class="nav-button" href="new.html" target="_blank" rel="noopener">News</a>
+          <a class="nav-button" href="best_HACKS.html" target="_blank" rel="noopener">Best hacks</a>
+          <a class="nav-button" href="Tutorials.html" target="_blank" rel="noopener">tutorials</a>
+          <a class="nav-button" href="all_Roms.html" target="_blank" rel="noopener">all rom hacks</a>
+          <a class="nav-button donate" href="#donate" >DONATE!!!</a>
+          
+        </div>
+      </nav>
+    </header>
+    <audio id="bgm" src="MP4.mp3" autoplay muted loop preload="auto" playsinline controlslist="nodownload noplaybackrate noremoteplayback" style="display:none" aria-hidden="true"></audio>
+    <main>
+      <section class="hero" id="best-hacks">
+        <h1>Welcome</h1>
+        <p>
+          This is a website where you gona find rom hacks and more abaut!!!!!
+        </p>
+      </section>
+
+      <section class="hero" id="tutorials" style="margin-top: 24px;">
+        <h1>This page is still in development</h1>
+        <p>
+          i adeded rom hacks to the page !!! you can dawnload now but stil in dev
+        </p>
+      </section>
+
+      <section class="hero" id="all-rom-hacks" style="margin-top: 24px;">
+        <h1>select on option from the bar</h1>
+        <p>
+           
+        </p>
+      </section>
+
+      <section class="hero" id="donate" style="margin-top: 24px;">
+        <h1>Donate</h1>
+        <p>
+          here is the home page here i write news about the page to now news about rom hacks click news button plese
+        </p>
+      </section>
+    </main>
+
+    <footer class="bottom-bar" role="contentinfo">
+      <small>© <span id="year"></span>Luis</small>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+      (function() {
+        var audio = document.getElementById('bgm');
+        if (!audio) return;
+        // Start playback as soon as possible (may be muted due to policies)
+        audio.play().catch(function() {});
+        var tryUnmute = function() {
+          try {
+            audio.muted = false;
+            audio.volume = 1.0;
+            audio.play().catch(function() {});
+          } catch (e) {}
+        };
+        if (audio.readyState >= 2) {
+          tryUnmute();
+        } else {
+          audio.addEventListener('canplay', function once() {
+            audio.removeEventListener('canplay', once);
+            tryUnmute();
+          });
+        }
+        // Fallback: unmute on first user interaction if autoplay with sound is blocked
+        document.addEventListener('pointerdown', tryUnmute, { once: true });
+        document.addEventListener('keydown', tryUnmute, { once: true });
+      })();
+    </script>
+  </body>
+  </html>
+
+

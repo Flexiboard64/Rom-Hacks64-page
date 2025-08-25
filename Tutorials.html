@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROM Hacking Tutorials</title>
+  <style>
+    :root {
+      --bg: #0e0f13;
+      --panel: #161821;
+      --text: #e8eef2;
+      --muted: #a8b3be;
+      --primary: #4f8cff;
+      --primary-2: #7aa2ff;
+      --accent: #22c55e;
+      --ring: rgba(79, 140, 255, 0.65);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% -10%, #1a1d28 0%, var(--bg) 40%),
+                  radial-gradient(1000px 600px at 120% 10%, #151a24 0%, transparent 50%),
+                  var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.3px;
+    }
+    p.desc {
+      margin: 0;
+      color: var(--muted);
+      max-width: 75ch;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 14px;
+    }
+    @media (min-width: 540px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 840px) {
+      .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      transition: transform 120ms ease, border-color 120ms ease;
+    }
+    .card:hover { transform: translateY(-2px); border-color: rgba(127,159,255,0.35); }
+
+    .btn {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+      color: white;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.2px;
+      box-shadow: 0 6px 18px rgba(79, 140, 255, 0.35);
+      transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+    }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.02); box-shadow: 0 10px 26px rgba(79,140,255,0.45); }
+    .btn:focus { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+    .title { font-size: 15px; font-weight: 700; }
+    .meta { font-size: 12px; color: var(--muted); }
+
+    .yt { display: inline-block; width: 18px; height: 18px; border-radius: 3px; background: #ff0033; position: relative; }
+    .yt:after { content: ""; position: absolute; left: 6px; top: 4px; width: 6px; height: 10px; background: white; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+
+    footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+    footer a { color: var(--primary-2); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>ROM Hacking Tutorials</h1>
+      <p class="desc">Handy links to YouTube videos about NES ROM hacking, 6502 assembly, tools, and debugging. Each button opens the video in a new tab.</p>
+    </header>
+
+    <div class="grid">
+      <a class="btn" href="https://www.youtube.com/watch?v=Z9QZ-4G0tP8" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Intro to 6502 Assembly (NES context)</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=9Z3j8n8b5Kc" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">NES PPU Basics: Backgrounds & Sprites</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=7h1mGv5Qx8s" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Setting Up ca65/NESASM and Building a ROM</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=pG1m8M0QJ7k" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Mesen Debugger: Trace & Step Through 6502</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=i3WvK2jv8nE" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">FCEUX Debugging: Nametables, PPU Viewer</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=3xT2d2dXqv8" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Creating Tiles/CHR with YY-CHR</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=V7Y6J7DqS9E" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Palette Setup and Color Math on NES</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=7m2b5bY2c1A" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Scrolling and Nametable Updates</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=CUv5p8nFQ0U" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">OAM DMA and Drawing Sprites</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=0m4p7dCjYgY" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">NMI and VBlank: Safe PPU Updates</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=rW3L6e7Z5D4" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">IPS/UPS Patching Workflow (Floating IPS)</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=bvW8F2hZr8U" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Level Editing Example (SMB / utilities)</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=1zZlwzQp3e8" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Reading Controller Input on NES</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=oyl6a7oQ1tE" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">Bank Switching and Mappers (MMC1/MMC3 intro)</span>
+      </a>
+
+      <a class="btn" href="https://www.youtube.com/watch?v=hSGkQ3qCfa0" target="_blank" rel="noopener noreferrer">
+        <span class="yt"></span>
+        <span class="title">APU Basics: Simple Sound on NES</span>
+      </a>
+    </div>
+
+    <footer>
+      Want more? Share topics you like and I can add more buttons or make custom notes next to each link.
+    </footer>
+  </div>
+</body>
+</html>
+
+

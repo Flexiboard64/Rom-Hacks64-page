@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROM Hacking News</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #0e0f13;
+      --muted: #5b6472;
+      --border: #e6e9ee;
+      --shadow: 0 12px 30px rgba(12, 18, 31, 0.08);
+      --accent: #111827;
+      --dot: #111827;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; background: var(--bg); color: var(--text); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 22px; }
+    header { margin-bottom: 14px; }
+    h1 { margin: 0; font-size: 26px; letter-spacing: .2px; }
+    p.desc { margin: 6px 0 0; color: var(--muted); }
+
+    .toolbar { display: grid; grid-template-columns: 200px; gap: 10px; margin: 16px 0; }
+    @media (max-width: 640px) { .toolbar { grid-template-columns: 1fr; } }
+    .select { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: #fff; color: var(--text); }
+
+    .grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 14px; }
+    @media (min-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1040px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; display: grid; gap: 8px; }
+    .title { margin: 0; font-size: 16px; line-height: 1.25; }
+    .title a { color: var(--accent); text-decoration: none; }
+    .title a:hover { text-decoration: underline; }
+    .meta { color: var(--muted); font-size: 12px; }
+    .summary { color: #1f2937; font-size: 13px; line-height: 1.35; max-height: 6.6em; overflow: hidden; }
+
+    .stats { margin: 6px 0 16px; color: var(--muted); font-size: 13px; }
+
+    .dot { position: fixed; left: 50%; transform: translateX(-50%); bottom: 10px; width: 12px; height: 12px; border-radius: 50%; background: var(--dot); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+    .sources { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; box-shadow: var(--shadow); color: var(--text); font-size: 13px; display: none; }
+    .sources a { color: #111827; text-decoration: none; }
+    .sources a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>ROM Hacking News</h1>
+      <p class="desc">Auto-aggregated updates from popular ROM hacking communities. Cards are white on a white background. Scroll to browse.</p>
+    </header>
+
+    <div class="toolbar">
+      <select id="source" class="select" aria-label="Source filter">
+        <option value="">All sources</option>
+      </select>
+    </div>
+
+    <div class="stats" id="stats">Loading…</div>
+    <div class="grid" id="grid" role="list"></div>
+  </div>
+
+  <div class="dot" id="dot" title="Show sources"></div>
+  <div class="sources" id="sources"></div>
+
+  <script>
+    // News sources (RSS/Atom where available). We use a CORS-friendly proxy to fetch on the client.
+    const SOURCES = [
+      { id: 'rhn-news', name: 'Romhacking.net — News', url: 'https://www.romhacking.net/feeds/news/' },
+      { id: 'rhn-hacks', name: 'Romhacking.net — Hacks', url: 'https://www.romhacking.net/feeds/hacks/' },
+      { id: 'smwc', name: 'SMW Central — SMW Hacks', url: 'https://www.smwcentral.net/rss/smwhacks' },
+      { id: 'sm64', name: 'SMW Central — SM64 Hacks', url: 'https://www.smwcentral.net/rss/sm64hacks' }
+    ];
+
+    // CORS proxy
+    const prox = url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+
+    const state = { source: '' };
+    const grid = document.getElementById('grid');
+    const stats = document.getElementById('stats');
+    const sourceSel = document.getElementById('source');
+    const dot = document.getElementById('dot');
+    const sourcesPopup = document.getElementById('sources');
+
+    // Fill source filter and popup
+    for (const s of SOURCES) {
+      const opt = document.createElement('option');
+      opt.value = s.id; opt.textContent = s.name; sourceSel.appendChild(opt);
+    }
+    sourcesPopup.innerHTML = `<div><strong>Sources</strong></div>` + SOURCES.map(s => `<div><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name}</a></div>`).join('');
+
+    dot.addEventListener('click', () => { sourcesPopup.style.display = (sourcesPopup.style.display === 'block' ? 'none' : 'block'); });
+
+    sourceSel.addEventListener('change', () => { state.source = sourceSel.value; render(); });
+
+    /** @typedef {{id:string, source:string, title:string, link:string, date:number, summary:string}} NewsItem */
+    /** @type {NewsItem[]} */
+    let ITEMS = [];
+
+    async function fetchFeed(src) {
+      try {
+        const res = await fetch(prox(src.url));
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const wrap = await res.json();
+        const xmlText = wrap.contents || wrap;
+        const doc = new window.DOMParser().parseFromString(xmlText, 'text/xml');
+        const isAtom = doc.documentElement.nodeName.toLowerCase().includes('feed');
+        const entries = isAtom ? [...doc.getElementsByTagName('entry')] : [...doc.getElementsByTagName('item')];
+        const list = entries.map((el, i) => {
+          const get = (tag) => {
+            const t = el.getElementsByTagName(tag)[0];
+            return t ? (t.textContent || '').trim() : '';
+          };
+          const getAttr = (tag, attr) => {
+            const t = el.getElementsByTagName(tag)[0];
+            return t ? (t.getAttribute(attr) || '') : '';
+          };
+          const title = get('title') || '(no title)';
+          const link = get('link') || getAttr('link','href');
+          const pub = get('pubDate') || get('updated') || get('dc:date');
+          const date = pub ? Date.parse(pub) : Date.now();
+          const desc = get('description') || get('content') || get('summary');
+          const summary = desc.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 240);
+          return { id: `${src.id}-${i}-${title.slice(0,20)}`, source: src.id, title, link, date, summary };
+        });
+        return list;
+      } catch (e) {
+        console.warn('Failed to fetch', src.name, e);
+        return [];
+      }
+    }
+
+    async function loadAll() {
+      stats.textContent = 'Loading feeds…';
+      const results = await Promise.all(SOURCES.map(fetchFeed));
+      ITEMS = results.flat().sort((a,b)=>b.date - a.date).slice(0, 180);
+      render();
+    }
+
+    function match(it) {
+      if (state.source && it.source !== state.source) return false;
+      return true;
+    }
+
+    function nameOf(id) { return (SOURCES.find(s => s.id === id) || {}).name || id; }
+
+    function render() {
+      const list = ITEMS.filter(match);
+      stats.textContent = `${list.length} of ${ITEMS.length} items shown`;
+      grid.innerHTML = '';
+      for (const n of list) {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.setAttribute('role','listitem');
+        card.innerHTML = `
+          <h3 class="title"><a href="${n.link}" target="_blank" rel="noopener noreferrer">${escapeHtml(n.title)}</a></h3>
+          <div class="meta">${nameOf(n.source)} • ${new Date(n.date).toLocaleString()}</div>
+          <div class="summary">${escapeHtml(n.summary)}</div>`;
+        grid.appendChild(card);
+      }
+    }
+
+    function escapeHtml(s) {
+      return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
+
+
