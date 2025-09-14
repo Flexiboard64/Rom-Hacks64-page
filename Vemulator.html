@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rom hack 64 Virtual Emulator</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #ddd;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid #444;
+      image-rendering: pixelated;
+    }
+    #romNotice {
+      position: fixed;
+      bottom: 5px;
+      right: 10px;
+      font-size: 12px;
+      color: #888;
+    }
+    select, input[type="file"] {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🕹️Rom hack 64 Virtual Emulator</h1>
+  <p>Select a system and upload a ROM</p>
+
+  <select id="systemSelect">
+    <option value="nes">NES</option>
+    <option value="snes">SNES</option>
+    <option value="gba">GBA</option>
+  </select>
+  <br>
+  <input type="file" id="romInput" accept=".nes,.smc,.sfc,.gba,.gb,.gbc" />
+  <br><br>
+  <div id="emulatorContainer">
+    <!-- Emulator canvas will be inserted here -->
+  </div>
+
+  <div id="romNotice">For ROM hack from the page only
+    Piracy is not allowed
+  </div>
+
+  <script>
+    const systemSelect = document.getElementById('systemSelect');
+    const romInput = document.getElementById('romInput');
+    const container = document.getElementById('emulatorContainer');
+
+    romInput.addEventListener('change', async function () {
+      const file = romInput.files[0];
+      if (!file) return;
+
+      const system = systemSelect.value;
+      const arrayBuffer = await file.arrayBuffer();
+      const romData = new Uint8Array(arrayBuffer);
+
+      container.innerHTML = ''; // clear previous
+
+      switch (system) {
+        case 'nes':
+          loadNES(romData);
+          break;
+        case 'snes':
+          loadSNES(romData);
+          break;
+        case 'gba':
+          loadGBA(romData);
+          break;
+        default:
+          alert('Unsupported system');
+      }
+    });
+
+    function loadNES(romData) {
+      const script = document.createElement('script');
+      script.src = "https://cdn.jsdelivr.net/npm/jsnes@0.8.0/dist/jsnes.min.js";
+      script.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 240;
+        container.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, 256, 240);
+
+        const nes = new jsnes.NES({
+          onFrame: function (framebuffer_24) {
+            for (let i = 0; i < framebuffer_24.length; i++) {
+              imageData.data[i] = framebuffer_24[i];
+            }
+            ctx.putImageData(imageData, 0, 0);
+          },
+          onAudioSample: function () { }
+        });
+
+        nes.loadROM(romData);
+        nes.start();
+      };
+      document.body.appendChild(script);
+    }
+
+    function loadSNES(romData) {
+      const iframe = document.createElement('iframe');
+      iframe.width = 512;
+      iframe.height = 448;
+      iframe.src = 'https://andwn.github.io/snes9x-wasm/';
+      iframe.style.border = 'none';
+      container.appendChild(iframe);
+
+      iframe.onload = () => {
+        const blob = new Blob([romData], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        iframe.contentWindow.postMessage({ type: 'loadRom', url }, '*');
+      };
+    }
+
+    function loadGBA(romData) {
+      const script = document.createElement('script');
+      script.src = "https://www.grantgalitz.org/gameboyadvance/libgba.js";
+      script.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 240;
+        canvas.height = 160;
+        container.appendChild(canvas);
+
+        const gba = new GameBoyAdvance();
+        gba.setCanvas(canvas);
+
+        gba.logLevel = gba.LOG_ERROR;
+
+        gba.loadROMFromFile(new Blob([romData]));
+        gba.runStable();
+      };
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>
